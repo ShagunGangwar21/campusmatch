@@ -6,6 +6,7 @@ import {
   Heart,
   Calendar,
   ArrowRight,
+  ArrowLeft,
   User,
   Scale,
   CheckCircle2,
@@ -70,8 +71,18 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-50 px-5 py-10 text-slate-900 dark:bg-slate-950 dark:text-white sm:px-8">
       <div className="mx-auto max-w-7xl">
+        {/* Back to Home Link */}
+        <Link
+          to="/"
+          className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-blue-600 dark:text-slate-300"
+        >
+          <ArrowLeft size={18} />
+          Back to Home
+        </Link>
+
         {/* Header Banner */}
         <div className="mb-8 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-white shadow-xl shadow-blue-600/10">
+
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3.5 py-1 text-xs font-bold text-white backdrop-blur-md">

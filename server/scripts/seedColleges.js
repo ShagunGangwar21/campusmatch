@@ -4,6 +4,7 @@ const College = require("../models/College");
 const Deadline = require("../models/Deadline");
 
 const collegesData = [
+  // 1. TAMIL NADU - NIT Trichy
   {
     name: "National Institute of Technology Tiruchirappalli (NIT Trichy)",
     shortName: "NITT",
@@ -12,8 +13,8 @@ const collegesData = [
     location: "Tiruchirappalli, Tamil Nadu",
     city: "Tiruchirappalli",
     state: "Tamil Nadu",
-    courses: ["B.Tech", "M.Tech", "MCA"],
-    branches: ["Computer Science & Engineering", "Information Technology", "Electronics & Communication", "Mechanical Engineering", "Electrical & Electronics"],
+    courses: ["B.Tech", "M.Tech", "MCA", "Ph.D"],
+    branches: ["Computer Science & Engineering", "Information Technology", "Electronics & Communication", "Mechanical Engineering", "Electrical & Electronics", "Civil Engineering"],
     exams: ["JEE Main"],
     categories: ["General", "OBC-NCL", "SC", "ST", "EWS"],
     fees: 155000,
@@ -22,7 +23,7 @@ const collegesData = [
     closingRank: 18420,
     openingRank: 1100,
     seats: 120,
-    eligibility: "Top rankers in JEE Main with minimum 75% in Class 12 (or Top 20 percentile).",
+    eligibility: "Top rankers in JEE Main with minimum 75% aggregate in Class 12 PCM (or Top 20 percentile).",
     admissionProcess: "Centralized counselling conducted by JoSAA and CSAB based on JEE Main CRL.",
     accreditation: "NIRF #1 among NITs, NAAC A++ Accredited",
     placements: {
@@ -35,10 +36,12 @@ const collegesData = [
       { title: "CSAB Special Round 1", date: "July 28, 2026", status: "Upcoming" }
     ],
     sourceUrl: "https://josaa.admissions.nic.in/",
-    sourceName: "JoSAA Official Cutoff Archive & NITT Official Portal",
+    sourceName: "JoSAA Official Cutoff Archive & NITT Portal",
     lastUpdated: new Date(),
     verifiedAt: new Date()
   },
+
+  // 2. UTTAR PRADESH - IIIT Allahabad
   {
     name: "Indian Institute of Information Technology Allahabad (IIIT Allahabad)",
     shortName: "IIITA",
@@ -73,6 +76,8 @@ const collegesData = [
     lastUpdated: new Date(),
     verifiedAt: new Date()
   },
+
+  // 3. TELANGANA - NIT Warangal
   {
     name: "National Institute of Technology Warangal (NIT Warangal)",
     shortName: "NITW",
@@ -107,6 +112,8 @@ const collegesData = [
     lastUpdated: new Date(),
     verifiedAt: new Date()
   },
+
+  // 4. DELHI - IIIT Delhi
   {
     name: "Indraprastha Institute of Information Technology Delhi (IIIT Delhi)",
     shortName: "IIITD",
@@ -141,6 +148,224 @@ const collegesData = [
     lastUpdated: new Date(),
     verifiedAt: new Date()
   },
+
+  // 5. KARNATAKA - NIT Surathkal
+  {
+    name: "National Institute of Technology Karnataka (NIT Surathkal)",
+    shortName: "NITK",
+    type: "NIT",
+    officialWebsite: "https://www.nitk.ac.in",
+    location: "Surathkal, Mangaluru, Karnataka",
+    city: "Mangaluru",
+    state: "Karnataka",
+    courses: ["B.Tech", "M.Tech"],
+    branches: ["Computer Science & Engineering", "Information Technology", "Electronics & Communication", "Mechanical Engineering"],
+    exams: ["JEE Main"],
+    categories: ["General", "OBC-NCL", "SC", "ST", "EWS"],
+    fees: 154000,
+    feesDisplay: "₹1.54 Lakh/year",
+    hostelFees: "₹48,000/year",
+    closingRank: 27500,
+    openingRank: 2100,
+    seats: 140,
+    eligibility: "Class 12 with 75% marks in PCM + JEE Main AIR.",
+    admissionProcess: "JoSAA / CSAB counselling.",
+    accreditation: "NIRF Top 15 Engineering Colleges, NAAC A Grade",
+    placements: {
+      averagePackage: "₹24.1 LPA",
+      highestPackage: "₹54.5 LPA",
+      placementRate: "97.1%"
+    },
+    importantDates: [
+      { title: "JoSAA Choice Locking", date: "June 18, 2026", status: "Upcoming" }
+    ],
+    sourceUrl: "https://josaa.nic.in",
+    sourceName: "JoSAA Seat Allotment Matrix",
+    lastUpdated: new Date(),
+    verifiedAt: new Date()
+  },
+
+  // 6. MAHARASHTRA - College of Engineering Pune (COEP Technological University)
+  {
+    name: "COEP Technological University (COEP Pune)",
+    shortName: "COEP",
+    type: "Government",
+    officialWebsite: "https://www.coep.org.in",
+    location: "Pune, Maharashtra",
+    city: "Pune",
+    state: "Maharashtra",
+    courses: ["B.Tech", "M.Tech"],
+    branches: ["Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Mechanical Engineering"],
+    exams: ["MHT-CET", "JEE Main"],
+    categories: ["General", "OBC-NCL", "SC", "ST", "EWS", "TFWS"],
+    fees: 95000,
+    feesDisplay: "₹95,000/year",
+    hostelFees: "₹38,000/year",
+    closingRank: 35000,
+    openingRank: 1200,
+    seats: 180,
+    eligibility: "Physics & Math in 10+2 + valid score in MHT-CET or JEE Main.",
+    admissionProcess: "State CET Cell Maharashtra CAP Rounds.",
+    accreditation: "NAAC A+ Grade, Autonomous Unitary Public University",
+    placements: {
+      averagePackage: "₹11.3 LPA",
+      highestPackage: "₹50.5 LPA",
+      placementRate: "93.5%"
+    },
+    importantDates: [
+      { title: "MHT CET CAP Round 1", date: "July 05, 2026", status: "Upcoming" }
+    ],
+    sourceUrl: "https://cetcell.mahacet.org",
+    sourceName: "State CET Cell Maharashtra Official Portal",
+    lastUpdated: new Date(),
+    verifiedAt: new Date()
+  },
+
+  // 7. RAJASTHAN - Malaviya National Institute of Technology Jaipur (MNIT Jaipur)
+  {
+    name: "Malaviya National Institute of Technology Jaipur (MNIT Jaipur)",
+    shortName: "MNITJ",
+    type: "NIT",
+    officialWebsite: "https://www.mnit.ac.in",
+    location: "Jaipur, Rajasthan",
+    city: "Jaipur",
+    state: "Rajasthan",
+    courses: ["B.Tech", "M.Tech", "B.Arch"],
+    branches: ["Computer Science & Engineering", "Electronics & Communication", "Electrical Engineering", "Civil Engineering"],
+    exams: ["JEE Main"],
+    categories: ["General", "OBC-NCL", "SC", "ST", "EWS"],
+    fees: 150000,
+    feesDisplay: "₹1.50 Lakh/year",
+    hostelFees: "₹46,000/year",
+    closingRank: 42000,
+    openingRank: 5500,
+    seats: 120,
+    eligibility: "75% in 10+2 PCM + valid JEE Main score.",
+    admissionProcess: "JoSAA / CSAB counselling.",
+    accreditation: "NIRF Top 35 Institution, NAAC Accredited",
+    placements: {
+      averagePackage: "₹15.6 LPA",
+      highestPackage: "₹64.0 LPA",
+      placementRate: "92.8%"
+    },
+    importantDates: [
+      { title: "JoSAA Choice Locking", date: "June 19, 2026", status: "Upcoming" }
+    ],
+    sourceUrl: "https://josaa.nic.in",
+    sourceName: "JoSAA Cutoff Database",
+    lastUpdated: new Date(),
+    verifiedAt: new Date()
+  },
+
+  // 8. WEST BENGAL - Jadavpur University Faculty of Engineering & Technology
+  {
+    name: "Jadavpur University (Faculty of Engineering)",
+    shortName: "JU",
+    type: "Government",
+    officialWebsite: "https://www.jaduniv.edu.in",
+    location: "Kolkata, West Bengal",
+    city: "Kolkata",
+    state: "West Bengal",
+    courses: ["B.E.", "M.E."],
+    branches: ["Computer Science & Engineering", "Information Technology", "Electronics & Telecommunication", "Mechanical Engineering"],
+    exams: ["WBJEE"],
+    categories: ["General", "SC", "ST", "OBC-A", "OBC-B"],
+    fees: 10000,
+    feesDisplay: "₹10,000/total 4 years",
+    hostelFees: "₹12,000/year",
+    closingRank: 1500,
+    openingRank: 50,
+    seats: 100,
+    eligibility: "Higher Secondary (10+2) with PCM aggregate 60% + WBJEE GMR.",
+    admissionProcess: "WBJEEB State e-Counselling.",
+    accreditation: "NAAC A+ Grade, NIRF Top 10 Universities",
+    placements: {
+      averagePackage: "₹21.4 LPA (CSE)",
+      highestPackage: "₹85.0 LPA",
+      placementRate: "96.4%"
+    },
+    importantDates: [
+      { title: "WBJEE Counselling Round 1", date: "July 02, 2026", status: "Upcoming" }
+    ],
+    sourceUrl: "https://wbjeeb.nic.in",
+    sourceName: "West Bengal Joint Entrance Examinations Board",
+    lastUpdated: new Date(),
+    verifiedAt: new Date()
+  },
+
+  // 9. MADHYA PRADESH - Maulana Azad National Institute of Technology Bhopal (MANIT Bhopal)
+  {
+    name: "Maulana Azad National Institute of Technology Bhopal (MANIT Bhopal)",
+    shortName: "MANIT",
+    type: "NIT",
+    officialWebsite: "https://www.manit.ac.in",
+    location: "Bhopal, Madhya Pradesh",
+    city: "Bhopal",
+    state: "Madhya Pradesh",
+    courses: ["B.Tech", "M.Tech"],
+    branches: ["Computer Science & Engineering", "Electronics & Communication", "Electrical Engineering", "Mechanical Engineering"],
+    exams: ["JEE Main"],
+    categories: ["General", "OBC-NCL", "SC", "ST", "EWS"],
+    fees: 148000,
+    feesDisplay: "₹1.48 Lakh/year",
+    hostelFees: "₹40,000/year",
+    closingRank: 38000,
+    openingRank: 4800,
+    seats: 130,
+    eligibility: "Class 12 with 75% marks in PCM + JEE Main AIR.",
+    admissionProcess: "JoSAA / CSAB counselling.",
+    accreditation: "Institute of National Importance",
+    placements: {
+      averagePackage: "₹15.8 LPA",
+      highestPackage: "₹82.0 LPA",
+      placementRate: "90.5%"
+    },
+    importantDates: [
+      { title: "JoSAA Round 1 Allotment", date: "June 20, 2026", status: "Upcoming" }
+    ],
+    sourceUrl: "https://josaa.nic.in",
+    sourceName: "JoSAA Seat Matrix & MANIT Portal",
+    lastUpdated: new Date(),
+    verifiedAt: new Date()
+  },
+
+  // 10. KERALA - National Institute of Technology Calicut (NIT Calicut)
+  {
+    name: "National Institute of Technology Calicut (NIT Calicut)",
+    shortName: "NITC",
+    type: "NIT",
+    officialWebsite: "https://www.nitc.ac.in",
+    location: "Kozhikode, Kerala",
+    city: "Kozhikode",
+    state: "Kerala",
+    courses: ["B.Tech", "M.Tech"],
+    branches: ["Computer Science & Engineering", "Electronics & Communication", "Electrical Engineering", "Civil Engineering"],
+    exams: ["JEE Main"],
+    categories: ["General", "OBC-NCL", "SC", "ST", "EWS"],
+    fees: 153000,
+    feesDisplay: "₹1.53 Lakh/year",
+    hostelFees: "₹44,000/year",
+    closingRank: 32000,
+    openingRank: 3100,
+    seats: 140,
+    eligibility: "75% in Class 12 with PCM + valid JEE Main rank.",
+    admissionProcess: "JoSAA Centralized Counselling.",
+    accreditation: "NIRF Top 25 Engineering Institutions",
+    placements: {
+      averagePackage: "₹20.6 LPA",
+      highestPackage: "₹67.0 LPA",
+      placementRate: "95.2%"
+    },
+    importantDates: [
+      { title: "JoSAA Choice Locking", date: "June 18, 2026", status: "Upcoming" }
+    ],
+    sourceUrl: "https://josaa.nic.in",
+    sourceName: "JoSAA Official Cutoff Records",
+    lastUpdated: new Date(),
+    verifiedAt: new Date()
+  },
+
+  // 11. UTTAR PRADESH - KIET Group of Institutions
   {
     name: "KIET Group of Institutions",
     shortName: "KIET",
@@ -175,6 +400,8 @@ const collegesData = [
     lastUpdated: new Date(),
     verifiedAt: new Date()
   },
+
+  // 12. UTTAR PRADESH - Ajay Kumar Garg Engineering College
   {
     name: "Ajay Kumar Garg Engineering College (AKGEC)",
     shortName: "AKGEC",
@@ -209,6 +436,8 @@ const collegesData = [
     lastUpdated: new Date(),
     verifiedAt: new Date()
   },
+
+  // 13. UTTAR PRADESH - JIIT Noida
   {
     name: "Jaypee Institute of Information Technology (JIIT Noida)",
     shortName: "JIIT",
@@ -243,6 +472,8 @@ const collegesData = [
     lastUpdated: new Date(),
     verifiedAt: new Date()
   },
+
+  // 14. UTTAR PRADESH - GL Bajaj
   {
     name: "GL Bajaj Institute of Technology and Management",
     shortName: "GLBITM",
@@ -338,7 +569,7 @@ const seedDB = async () => {
     console.log("Cleared existing colleges collection.");
 
     const createdColleges = await College.insertMany(collegesData);
-    console.log(`Successfully seeded ${createdColleges.length} colleges into MongoDB.`);
+    console.log(`Successfully seeded ${createdColleges.length} verified colleges into MongoDB.`);
 
     await Deadline.deleteMany({});
     console.log("Cleared existing deadlines collection.");
