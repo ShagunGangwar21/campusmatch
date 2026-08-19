@@ -8,14 +8,18 @@ const authRoutes = require("./routes/authRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const collegeRoutes = require("./routes/collegeRoutes");
 const recommendationRoutes = require("./routes/recommendationRoutes");
+const favoriteRoutes = require("./routes/favoriteRoutes");
+const deadlineRoutes = require("./routes/deadlineRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:5173",
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -32,6 +36,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/colleges", collegeRoutes);
 app.use("/api/recommendations", recommendationRoutes);
+app.use("/api/favorites", favoriteRoutes);
+app.use("/api/deadlines", deadlineRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: "Route not found" });

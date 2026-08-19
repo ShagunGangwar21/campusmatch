@@ -1,44 +1,57 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowLeft,
-  ArrowUpRight,
-  Heart,
-  MapPin,
   Search,
   SlidersHorizontal,
-  TrendingUp,
+  Loader2,
+  GraduationCap,
 } from "lucide-react";
-
-import colleges from "../data/colleges";
+import CollegeCard from "../components/CollegeCard";
 
 function Colleges() {
+  const [colleges, setColleges] = useState([]);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("All");
   const [branch, setBranch] = useState("All");
+  const [sort, setSort] = useState("default");
+  const [loading, setLoading] = useState(true);
 
-  const filteredColleges = useMemo(() => {
-    return colleges.filter((college) => {
-      const matchesSearch =
-        college.name.toLowerCase().includes(search.toLowerCase()) ||
-        college.city.toLowerCase().includes(search.toLowerCase()) ||
-        college.state.toLowerCase().includes(search.toLowerCase());
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-      const matchesType =
-        type === "All" || college.type === type;
+  const fetchColleges = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams();
 
-      const matchesBranch =
-        branch === "All" || college.branch === branch;
+      if (search.trim()) queryParams.append("search", search.trim());
+      if (type !== "All") queryParams.append("type", type);
+      if (branch !== "All") queryParams.append("branch", branch);
+      if (sort !== "default") queryParams.append("sort", sort);
 
-      return matchesSearch && matchesType && matchesBranch;
-    });
-  }, [search, type, branch]);
+      const response = await fetch(`${API_BASE_URL}/colleges?${queryParams.toString()}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setColleges(data.colleges || []);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchColleges();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search, type, branch, sort]);
 
   return (
     <div className="min-h-screen bg-slate-50 px-5 py-10 text-slate-900 dark:bg-slate-950 dark:text-white sm:px-8">
-
       <div className="mx-auto max-w-7xl">
-
         {/* Back */}
         <Link
           to="/"
@@ -55,20 +68,17 @@ function Colleges() {
           </p>
 
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            Find the right college for you
+            Discover Engineering Institutions
           </h1>
 
           <p className="mt-3 max-w-2xl text-slate-600 dark:text-slate-400">
-            Explore colleges based on your branch, location, admission
-            chances and budget.
+            Search top IITs, NITs, IIITs and state universities by branch, location, tuition fees, and admission cutoffs.
           </p>
         </div>
 
         {/* Filters */}
-        <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-
+        <div className="mb-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-
             {/* Search */}
             <div className="relative flex-1">
               <Search
@@ -78,28 +88,28 @@ function Colleges() {
 
               <input
                 type="text"
-                placeholder="Search college, city or state..."
+                placeholder="Search by college name, city or state..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950"
+                className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
               />
             </div>
 
             {/* Type */}
             <div className="flex items-center gap-2">
-              <SlidersHorizontal
-                size={18}
-                className="text-slate-400"
-              />
-
+              <SlidersHorizontal size={18} className="text-slate-400 shrink-0" />
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950"
+                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
               >
                 <option value="All">All Types</option>
+                <option value="IIT">IIT</option>
                 <option value="NIT">NIT</option>
                 <option value="IIIT">IIIT</option>
+                <option value="Government">Government</option>
+                <option value="Private">Private</option>
+                <option value="Deemed">Deemed</option>
               </select>
             </div>
 
@@ -107,166 +117,80 @@ function Colleges() {
             <select
               value={branch}
               onChange={(e) => setBranch(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950"
+              className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
             >
               <option value="All">All Branches</option>
-              <option value="Computer Science & Engineering">
-                CSE
-              </option>
-              <option value="Information Technology">
-                IT
-              </option>
-              <option value="Electronics & Communication">
-                ECE
-              </option>
-              <option value="Electrical Engineering">
-                Electrical
-              </option>
-              <option value="Mechanical Engineering">
-                Mechanical
-              </option>
-              <option value="Civil Engineering">
-                Civil
-              </option>
+              <option value="Computer Science">Computer Science & Engineering</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Electronics & Communication">Electronics & Communication</option>
+              <option value="Electrical Engineering">Electrical Engineering</option>
+              <option value="Mechanical Engineering">Mechanical Engineering</option>
             </select>
 
+            {/* Sort */}
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+            >
+              <option value="default">Sort By: Name</option>
+              <option value="bestRank">Best Cutoff Rank</option>
+              <option value="lowestFees">Lowest Tuition Fees</option>
+              <option value="highestFees">Highest Tuition Fees</option>
+            </select>
           </div>
         </div>
 
         {/* Result Count */}
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Showing{" "}
-            <span className="font-semibold text-slate-900 dark:text-white">
-              {filteredColleges.length}
+            Found{" "}
+            <span className="font-bold text-slate-900 dark:text-white">
+              {colleges.length}
             </span>{" "}
-            colleges
+            colleges matching your criteria
           </p>
+
+          <Link
+            to="/compare"
+            className="text-xs font-bold text-blue-600 hover:underline"
+          >
+            Launch Comparison Matrix →
+          </Link>
         </div>
 
-        {/* College Cards */}
-        {filteredColleges.length > 0 ? (
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-
-            {filteredColleges.map((college) => (
-              <div
-                key={college.id}
-                className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-slate-200/60 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-blue-800 dark:hover:shadow-black/20"
-              >
-
-                {/* Top */}
-                <div className="flex items-start justify-between">
-
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-lg font-bold text-blue-600 dark:bg-blue-950">
-                    {college.shortName}
-                  </div>
-
-                  <button
-                    type="button"
-                    aria-label={`Save ${college.name}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-400 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500 dark:border-slate-700"
-                  >
-                    <Heart size={17} />
-                  </button>
-
-                </div>
-
-                {/* College Name */}
-                <h2 className="mt-5 text-xl font-bold">
-                  {college.name}
-                </h2>
-
-                {/* Location */}
-                <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-                  <MapPin size={14} />
-                  <span>{college.location}</span>
-                </div>
-
-                {/* Branch */}
-                <p className="mt-4 text-sm font-medium text-slate-700 dark:text-slate-300">
-                  {college.branch}
-                </p>
-
-                {/* Match + Rank */}
-                <div className="mt-6 grid grid-cols-2 gap-3">
-
-                  <div className="rounded-xl bg-blue-50 p-4 dark:bg-blue-950/50">
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                      Your Match
-                    </p>
-
-                    <div className="mt-1 flex items-center gap-1.5 text-xl font-bold text-blue-600">
-                      <TrendingUp size={17} />
-                      {college.match}%
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-950">
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                      Closing Rank
-                    </p>
-
-                    <p className="mt-1 text-lg font-bold">
-                      {college.closingRank.toLocaleString()}
-                    </p>
-                  </div>
-
-                </div>
-
-                {/* Footer */}
-                <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-5 dark:border-slate-800">
-
-                  <div>
-                    <p className="text-xs text-slate-500">
-                      Total fees
-                    </p>
-
-                    <p className="mt-0.5 font-bold">
-                      {college.feesDisplay}
-                    </p>
-                  </div>
-
-                  <Link
-                    to={`/college/${college.id}`}
-                    className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-                  >
-                    Explore
-                    <ArrowUpRight size={15} />
-                  </Link>
-
-                </div>
-
-              </div>
+        {/* College Grid */}
+        {loading ? (
+          <div className="flex min-h-[300px] items-center justify-center">
+            <Loader2 className="animate-spin text-blue-600" size={30} />
+          </div>
+        ) : colleges.length > 0 ? (
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {colleges.map((college) => (
+              <CollegeCard key={college.id || college._id} college={college} />
             ))}
-
           </div>
         ) : (
-          /* No Results */
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center dark:border-slate-700 dark:bg-slate-900">
-
-            <h2 className="text-xl font-bold">
-              No colleges found
-            </h2>
-
+          <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center dark:border-slate-700 dark:bg-slate-900">
+            <GraduationCap size={40} className="mx-auto text-slate-400" />
+            <h2 className="mt-4 text-xl font-bold">No colleges found</h2>
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              Try changing your search or filters.
+              Try broadening your search term or clearing active filters.
             </p>
-
             <button
               type="button"
               onClick={() => {
                 setSearch("");
                 setType("All");
                 setBranch("All");
+                setSort("default");
               }}
               className="mt-5 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700"
             >
-              Clear Filters
+              Reset Filters
             </button>
-
           </div>
         )}
-
       </div>
     </div>
   );

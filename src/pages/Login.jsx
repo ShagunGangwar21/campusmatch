@@ -1,9 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, GraduationCap } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,7 +14,6 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setError("");
 
     if (!email || !password) {
@@ -22,40 +23,11 @@ function Login() {
 
     try {
       setLoading(true);
-
-      const response = await fetch(
-        "http://localhost:5000/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "Login failed");
-        return;
-      }
-
-      // Save JWT token
-      localStorage.setItem("token", data.token);
-
-      // Save user information
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      alert("Login successful!");
-
-      navigate("/");
-    } catch (error) {
-      console.error("Login error:", error);
-      setError("Unable to connect to server");
+      await login(email, password);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(err.message || "Invalid credentials or unable to connect");
     } finally {
       setLoading(false);
     }
@@ -63,11 +35,8 @@ function Login() {
 
   return (
     <div className="min-h-screen bg-slate-50 px-5 py-10 dark:bg-slate-950 sm:px-8">
-
       <div className="mx-auto flex min-h-[80vh] max-w-md items-center">
-
         <div className="w-full">
-
           {/* Back */}
           <Link
             to="/"
@@ -79,7 +48,6 @@ function Login() {
 
           {/* Card */}
           <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
-
             {/* Logo */}
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-600/20">
               <GraduationCap size={25} />
@@ -104,11 +72,7 @@ function Login() {
               </div>
             )}
 
-            <form
-              onSubmit={handleSubmit}
-              className="mt-7 space-y-5"
-            >
-
+            <form onSubmit={handleSubmit} className="mt-7 space-y-5">
               {/* Email */}
               <div>
                 <label
@@ -131,21 +95,20 @@ function Login() {
 
               {/* Password */}
               <div>
-                <label
-                  htmlFor="password"
-                  className="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-200"
-                >
-                  Password
-                </label>
-
-                <div className="flex justify-end">
-                <Link
-                  to="/forgot-password"
-                  className="text-sm font-semibold text-blue-600 hover:text-blue-700"
-                >
-                  Forgot Password?
-                </Link>
-              </div>
+                <div className="mb-2 flex items-center justify-between">
+                  <label
+                    htmlFor="password"
+                    className="text-sm font-semibold text-slate-800 dark:text-slate-200"
+                  >
+                    Password
+                  </label>
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
 
                 <input
                   id="password"
@@ -165,26 +128,21 @@ function Login() {
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "Logging in..." : "Login"}
-
                 {!loading && <ArrowRight size={17} />}
               </button>
-
             </form>
 
             <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
               Don't have an account?{" "}
               <Link
-                to="/admission"
+                to="/register"
                 className="font-semibold text-blue-600 hover:text-blue-700"
               >
-                Get Started
+                Create Account
               </Link>
             </p>
-
           </div>
-
         </div>
-
       </div>
     </div>
   );

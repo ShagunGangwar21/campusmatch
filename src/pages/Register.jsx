@@ -1,9 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, GraduationCap } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -14,7 +16,6 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setError("");
 
     if (!name || !email || !password) {
@@ -29,44 +30,12 @@ function Register() {
 
     try {
       setLoading(true);
-
-      const response = await fetch(
-        "http://localhost:5000/api/auth/register",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            name,
-            email,
-            password,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "Registration failed");
-        return;
-      }
-
-      // Save login information
-      localStorage.setItem("token", data.token);
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(data.user)
-      );
-
+      await register(name, email, password);
+      // Redirect new users straight to admission profile setup
       navigate("/admission");
-    } catch (error) {
-      console.error("Register error:", error);
-
-      setError("Unable to connect to server");
+    } catch (err) {
+      console.error("Register error:", err);
+      setError(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -74,11 +43,8 @@ function Register() {
 
   return (
     <div className="min-h-screen bg-slate-50 px-5 py-10 dark:bg-slate-950 sm:px-8">
-
       <div className="mx-auto flex min-h-[80vh] max-w-md items-center">
-
         <div className="w-full">
-
           <Link
             to="/"
             className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 dark:text-slate-300"
@@ -88,7 +54,6 @@ function Register() {
           </Link>
 
           <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
-
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-600/20">
               <GraduationCap size={25} />
             </div>
@@ -111,11 +76,7 @@ function Register() {
               </div>
             )}
 
-            <form
-              onSubmit={handleSubmit}
-              className="mt-7 space-y-5"
-            >
-
+            <form onSubmit={handleSubmit} className="mt-7 space-y-5">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-200">
                   Full Name
@@ -126,6 +87,7 @@ function Register() {
                   placeholder="Enter your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  required
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
                 />
               </div>
@@ -140,6 +102,7 @@ function Register() {
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
                 />
               </div>
@@ -154,6 +117,7 @@ function Register() {
                   placeholder="Minimum 6 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
                 />
               </div>
@@ -164,15 +128,12 @@ function Register() {
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-60"
               >
                 {loading ? "Creating Account..." : "Create Account"}
-
                 {!loading && <ArrowRight size={17} />}
               </button>
-
             </form>
 
             <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
               Already have an account?{" "}
-
               <Link
                 to="/login"
                 className="font-semibold text-blue-600 hover:text-blue-700"
@@ -180,7 +141,6 @@ function Register() {
                 Login
               </Link>
             </p>
-
           </div>
         </div>
       </div>

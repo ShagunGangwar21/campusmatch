@@ -1,38 +1,86 @@
-import {
-  ArrowLeft,
-  ArrowRight,
-  MapPin,
-  TrendingUp,
-} from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-import colleges from "../data/colleges";
+import { useEffect, useState } from "react";
+import { ArrowLeft, GraduationCap, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import CollegeCard from "../components/CollegeCard";
 
 function Recommendations() {
-  const location = useLocation();
+  const [colleges, setColleges] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const student = location.state?.student;
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-  // If user opens /recommendations directly
-  // without submitting the form
-  if (!student) {
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setError("Please login to view your personalized college recommendations.");
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/recommendations`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load recommendations");
+        }
+
+        setColleges(data.recommendations || data.colleges || []);
+        setProfile(data.profile || null);
+      } catch (err) {
+        console.error(err);
+        setError(err.message || "Unable to connect to server");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, []);
+
+  if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-5 dark:bg-slate-950">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Student profile not found
-          </h1>
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex items-center gap-3 text-blue-600">
+          <Loader2 className="animate-spin" size={25} />
+          <span className="font-semibold">Analyzing cutoff trends and generating predictions...</span>
+        </div>
+      </div>
+    );
+  }
 
-          <p className="mt-2 text-slate-600 dark:text-slate-400">
-            Please complete your admission profile first.
-          </p>
-
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50 px-5 py-10 dark:bg-slate-950">
+        <div className="mx-auto max-w-4xl">
           <Link
-            to="/admission"
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
+            to="/dashboard"
+            className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 dark:text-slate-300"
           >
-            Complete Profile
-            <ArrowRight size={17} />
+            <ArrowLeft size={18} />
+            Back to Dashboard
           </Link>
+
+          <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-900 dark:bg-red-950/30">
+            <h3 className="text-xl font-bold text-red-600 dark:text-red-400">{error}</h3>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              Please complete your admission profile with your rank, exam, and category details.
+            </p>
+            <Link
+              to="/admission"
+              className="mt-6 inline-block rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+            >
+              Set Up Preferences
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -41,160 +89,84 @@ function Recommendations() {
   return (
     <div className="min-h-screen bg-slate-50 px-5 py-10 text-slate-900 dark:bg-slate-950 dark:text-white sm:px-8">
       <div className="mx-auto max-w-7xl">
-
         {/* Back */}
         <Link
-          to="/admission"
+          to="/dashboard"
           className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-blue-600 dark:text-slate-300"
         >
           <ArrowLeft size={18} />
-          Edit Profile
+          Back to Dashboard
         </Link>
 
         {/* Header */}
         <div className="mb-10">
-          <p className="text-sm font-bold uppercase tracking-widest text-blue-600">
-            Your Recommendations
-          </p>
+          <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-blue-600">
+            <Sparkles size={18} />
+            Smart Prediction Engine
+          </div>
 
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            Colleges that match your profile
+            Personalized College Recommendations
           </h1>
 
           <p className="mt-3 max-w-2xl text-slate-600 dark:text-slate-400">
-            Based on your rank, category, preferred branch and budget,
-            here are some colleges you can explore.
+            Colleges categorized by admission chance (SAFE, LIKELY, TARGET, AMBITIOUS) based on historical JoSAA/CSAB opening & closing ranks.
           </p>
         </div>
 
-        {/* Student Summary */}
-        <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-
-            <div>
-              <p className="text-xs font-medium text-slate-500">
-                Exam Rank
-              </p>
-              <p className="mt-1 font-bold">
-                {student.rank}
-              </p>
+        {/* Profile Summary */}
+        {profile && (
+          <div className="mb-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
+              <h3 className="font-bold text-slate-900 dark:text-white">Active Student Profile</h3>
+              <Link to="/admission" className="text-xs font-bold text-blue-600 hover:underline">
+                Edit Preferences
+              </Link>
             </div>
-
-            <div>
-              <p className="text-xs font-medium text-slate-500">
-                Category
-              </p>
-              <p className="mt-1 font-bold">
-                {student.category}
-              </p>
+            <div className="mt-4 grid gap-5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+              <div>
+                <p className="text-xs text-slate-400">Entrance Exam</p>
+                <p className="mt-1 font-bold">{profile.exam}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">Exam Rank</p>
+                <p className="mt-1 font-bold">AIR {Number(profile.rank).toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">Category</p>
+                <p className="mt-1 font-bold">{profile.category}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">Home State</p>
+                <p className="mt-1 font-bold">{profile.state}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">Preferred Branch</p>
+                <p className="mt-1 font-bold">{profile.branch}</p>
+              </div>
             </div>
+          </div>
+        )}
 
-            <div>
-              <p className="text-xs font-medium text-slate-500">
-                Home State
-              </p>
-              <p className="mt-1 font-bold">
-                {student.state}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs font-medium text-slate-500">
-                Preferred Branch
-              </p>
-              <p className="mt-1 font-bold">
-                {student.branch}
-              </p>
-            </div>
-
+        {/* Prediction Explanation Box */}
+        <div className="mb-8 rounded-2xl bg-blue-50/70 p-5 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50">
+          <p className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+            Admission Chance Tiers:
+          </p>
+          <div className="mt-2 flex flex-wrap gap-4 text-xs font-semibold text-slate-700 dark:text-slate-300">
+            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> <strong>SAFE:</strong> Rank comfortably inside closing cutoff</span>
+            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-blue-500"></span> <strong>LIKELY:</strong> Rank matches cutoff bounds</span>
+            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-amber-500"></span> <strong>TARGET:</strong> Competitive (High chance in round 2-5)</span>
+            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-purple-500"></span> <strong>AMBITIOUS:</strong> Possible in CSAB special rounds</span>
           </div>
         </div>
 
-        {/* College Cards */}
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {/* Recommendations Grid */}
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {colleges.map((college) => (
-            <div
-              key={college.id}
-              className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900 dark:hover:border-blue-700"
-            >
-
-              {/* Top */}
-              <div className="flex items-start justify-between">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-lg font-bold text-blue-600 dark:bg-blue-950">
-                  {college.name.charAt(0)}
-                </div>
-
-                <div className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:bg-emerald-950">
-                  {college.match}% Match
-                </div>
-              </div>
-
-              {/* Name */}
-              <h2 className="mt-5 text-xl font-bold">
-                {college.name}
-              </h2>
-
-              {/* Location */}
-              <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-                <MapPin size={14} />
-                {college.location}
-              </div>
-
-              {/* Branch */}
-              <p className="mt-4 text-sm font-medium">
-                {college.branch}
-              </p>
-
-              {/* Match */}
-              <div className="mt-6 rounded-xl bg-blue-50 p-4 dark:bg-blue-950/50">
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                  Match Score
-                </p>
-
-                <div className="mt-1 flex items-center gap-2 text-xl font-bold text-blue-600">
-                  <TrendingUp size={18} />
-                  {college.match}%
-                </div>
-              </div>
-
-              {/* Details */}
-              <div className="mt-4 grid grid-cols-2 gap-3">
-
-                <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800">
-                  <p className="text-xs text-slate-500">
-                    Closing Rank
-                  </p>
-
-                  <p className="mt-1 font-bold">
-                    {college.cutoff.toLocaleString("en-IN")}
-                  </p>
-                </div>
-
-                <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800">
-                  <p className="text-xs text-slate-500">
-                    Total Fees
-                  </p>
-
-                  <p className="mt-1 font-bold">
-                    ₹{(college.fees / 100000).toFixed(1)}L
-                  </p>
-                </div>
-
-              </div>
-
-              {/* Explore */}
-              <button
-                type="button"
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-              >
-                Explore College
-                <ArrowRight size={16} />
-              </button>
-
-            </div>
+            <CollegeCard key={college.id || college._id} college={college} />
           ))}
         </div>
-
       </div>
     </div>
   );

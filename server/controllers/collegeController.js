@@ -1,86 +1,124 @@
-const Profile = require("../models/Profile");
-const colleges = require("../data/colleges");
+const College = require("../models/College");
+const fallbackColleges = require("../data/colleges");
 
-const getRecommendedColleges = async (req, res) => {
+const getColleges = async (req, res) => {
   try {
-    const profile = await Profile.findOne({
-      userId: req.userId,
-    });
+    const { search, state, branch, type, exam, maxFees, sort } = req.query;
 
-    if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: "Profile not found",
-      });
+    let query = {};
+
+    if (search) {
+      const searchRegex = new RegExp(search.trim(), "i");
+      query.$or = [
+        { name: searchRegex },
+        { shortName: searchRegex },
+        { city: searchRegex },
+        { state: searchRegex },
+      ];
     }
 
-    const studentRank = Number(profile.rank);
-    const studentBudget = Number(profile.budget);
+    if (state && state !== "All") {
+      query.state = new RegExp(state.trim(), "i");
+    }
 
-    const recommended = colleges
-      .map((college) => {
-        let score = 0;
+    if (type && type !== "All") {
+      query.type = type;
+    }
 
-        // Rank match
-        if (studentRank <= college.closingRank) {
-          score += 50;
-        } else {
-          const difference =
-            studentRank - college.closingRank;
+    if (branch && branch !== "All") {
+      query.branches = new RegExp(branch.trim(), "i");
+    }
 
-          if (difference <= 10000) {
-            score += 35;
-          } else if (difference <= 20000) {
-            score += 20;
-          }
-        }
+    if (exam && exam !== "All") {
+      query.exams = new RegExp(exam.trim(), "i");
+    }
 
-        // Branch match
-        if (
-          college.branch
-            .toLowerCase()
-            .includes(profile.branch.toLowerCase())
-        ) {
-          score += 25;
-        }
+    if (maxFees) {
+      query.fees = { $lte: Number(maxFees) };
+    }
 
-        // Budget match
-        if (college.fees <= studentBudget) {
-          score += 20;
-        }
+    let sortOption = { name: 1 };
+    if (sort === "lowestFees") sortOption = { fees: 1 };
+    if (sort === "highestFees") sortOption = { fees: -1 };
+    if (sort === "bestRank") sortOption = { closingRank: 1 };
 
-        // State preference
-        if (
-          college.state.toLowerCase() ===
-          profile.state.toLowerCase()
-        ) {
-          score += 5;
-        }
+    let colleges = await College.find(query).sort(sortOption).lean();
 
-        return {
-          ...college,
-          match: Math.min(score, 100),
-        };
-      })
-      .filter((college) => college.match >= 40)
-      .sort((a, b) => b.match - a.match);
+    // If DB is empty, use fallback memory dataset
+    if ((!colleges || colleges.length === 0) && Object.keys(query).length === 0) {
+      colleges = fallbackColleges.map((c) => ({
+        _id: String(c.id),
+        ...c,
+        branches: [c.branch || "CSE"],
+        exams: c.exams || ["JEE Main"],
+      }));
+    }
 
     res.status(200).json({
       success: true,
-      profile,
-      count: recommended.length,
-      colleges: recommended,
+      count: colleges.length,
+      colleges,
     });
   } catch (error) {
-    console.error("Recommendation error:", error);
-
+    console.error("Get colleges error:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to generate recommendations",
+      message: "Failed to fetch colleges",
+    });
+  }
+};
+
+const getCollegeById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    let college = null;
+
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      college = await College.findById(id).lean();
+    }
+
+    if (!college) {
+      // Try finding by numeric id or shortName or fallback data
+      college = await College.findOne({
+        $or: [{ shortName: new RegExp(`^${id}$`, "i") }],
+      }).lean();
+    }
+
+    if (!college) {
+      const numericId = Number(id);
+      const fallback = fallbackColleges.find((c) => c.id === numericId || c.shortName.toLowerCase() === id.toLowerCase());
+      if (fallback) {
+        college = {
+          _id: String(fallback.id),
+          ...fallback,
+          branches: [fallback.branch || "CSE"],
+          exams: fallback.exams || ["JEE Main"],
+        };
+      }
+    }
+
+    if (!college) {
+      return res.status(404).json({
+        success: false,
+        message: "College not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      college,
+    });
+  } catch (error) {
+    console.error("Get college details error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch college details",
     });
   }
 };
 
 module.exports = {
-  getRecommendedColleges,
+  getColleges,
+  getCollegeById,
 };
