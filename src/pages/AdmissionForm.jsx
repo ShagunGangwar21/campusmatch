@@ -43,7 +43,7 @@ function AdmissionForm() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/profile",
+         `${import.meta.env.VITE_API_URL}/profile`,
         {
           method: "POST",
           headers: {
